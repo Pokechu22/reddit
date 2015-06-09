@@ -164,6 +164,7 @@ error_list = dict((
         ('CANT_CREATE_SR', _("your account is too new to create a subreddit. please contact the admins to request an exemption.")),
         ('BAD_PROMO_MOBILE_OS', _("you must select at least one mobile OS to target")),
         ('BAD_PROMO_MOBILE_PRIORITY', _("mobile campaigns may only use house priority")),
+        ('BAD_ENTITY', _("your post contains an invalid html entity")),
     ))
 
 errors = Storage([(e, e) for e in error_list.keys()])

@@ -635,9 +635,8 @@ class VMarkdown(Validator):
         except SoupError as e:
             # Could happen if someone does `&#00;`. It's not a security issue,
             # it's just unacceptable.
-            # TODO: give a better indication to the user of what happened
             if isinstance(e, SoupUnsupportedEntityError):
-                abort(400)
+                self.set_error(errors.BAD_ENTITY, code=400)
                 return
 
             import sys
