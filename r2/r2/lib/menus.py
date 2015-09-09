@@ -121,7 +121,7 @@ menu =   MenuHandler(hot          = _('hot'),
                      traffic      = _("traffic stats"),
                      stylesheet   = _("stylesheet"),
 
-                     # reddits
+                     # subreddits
                      home         = _("home"),
                      about        = _("about"),
                      edit_subscriptions = _("edit subscriptions"),
@@ -140,6 +140,7 @@ menu =   MenuHandler(hot          = _('hot'),
                      edited       = _("edited"),
                      employee     = _("employee"),
                      automod      = _("automoderator config"),
+                     multireddits = _("edit subreddit multireddits"),
                      
                      wikibanned        = _("ban wiki contributors"),
                      wikicontributors  = _("add wiki contributors"),
