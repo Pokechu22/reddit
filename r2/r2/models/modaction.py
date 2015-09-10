@@ -62,7 +62,8 @@ class ModAction(tdb_cassandra.UuidThing):
                'removewikicontributor', 'wikirevise', 'wikipermlevel',
                'ignorereports', 'unignorereports', 'setpermissions',
                'setsuggestedsort', 'sticky', 'unsticky', 'setcontestmode',
-               'unsetcontestmode', 'lock', 'unlock', 'muteuser', 'unmuteuser')
+               'unsetcontestmode', 'lock', 'unlock', 'muteuser', 'unmuteuser'
+               'addmultireddit', 'editmultireddit', 'removemultireddit')
 
     _menu = {'banuser': _('ban user'),
              'unbanuser': _('unban user'),
@@ -100,6 +101,9 @@ class ModAction(tdb_cassandra.UuidThing):
              'unlock': _('unlock post'),
              'muteuser': _('mute user'),
              'unmuteuser': _('unmute user'),
+             'addmultireddit': _('add new subreddit multireddit'),
+             'editmultireddit': _('edit subreddit multireddit'),
+             'removemultireddit': _('delete subreddit multireddit')
             }
 
     _text = {'banuser': _('banned'),
@@ -138,6 +142,9 @@ class ModAction(tdb_cassandra.UuidThing):
              'unlock': _('unlocked'),
              'muteuser': _('muted'),
              'unmuteuser': _('unmuted'),
+             'addmultireddit': _('created new subreddit multireddit'),
+             'editmultireddit': _('edited subreddit multireddit'),
+             'removemultireddit': _('deleted subreddit multireddit')
             }
 
     _details_text = {# approve comment/link
