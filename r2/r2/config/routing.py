@@ -175,6 +175,7 @@ def make_map(config):
     mc('/about/sidebar', controller='front', action='sidebar')
     mc('/about/sticky', controller='front', action='sticky')
     mc('/about/flair', controller='front', action='flairlisting')
+    mc('/about/multireddits', controller='front', action='subreddit_multireddits')
     mc('/about', controller='front', action='about')
     for connect in (mc,) + multi_prefixes:
        connect('/about/message/:where', controller='message',

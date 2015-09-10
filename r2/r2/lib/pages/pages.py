@@ -5400,3 +5400,6 @@ class GeotargetNotice(Templated):
 
 class ShareClose(Templated):
     pass
+
+class SubredditMultireddits(Reddit):
+    pass
