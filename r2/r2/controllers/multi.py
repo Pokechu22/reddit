@@ -260,8 +260,7 @@ class MultiApiController(RedditController):
         self._write_multi_data(multi, data)
 
         if isinstance(owner, Subreddit):
-            ModAction.create(owner, c.user, 'addmultireddit',
-                             target=multi)
+            ModAction.create(owner, c.user, 'addmultireddit')
 
         return self._format_multi(multi)
 
@@ -282,15 +281,13 @@ class MultiApiController(RedditController):
             multi = LabeledMulti._byID(path_info['path'])
 
             if isinstance(owner, Subreddit):
-                ModAction.create(owner, c.user, 'editmultireddit',
-                                 target=multi)
+                ModAction.create(owner, c.user, 'editmultireddit')
         except tdb_cassandra.NotFound:
             multi = LabeledMulti.create(path_info['path'], owner)
             response.status = 201
 
             if isinstance(owner, Subreddit):
-                ModAction.create(owner, c.user, 'addmultireddit',
-                                 target=multi)
+                ModAction.create(owner, c.user, 'addmultireddit')
 
         self._write_multi_data(multi, data)
         return self._format_multi(multi)
@@ -305,8 +302,7 @@ class MultiApiController(RedditController):
     def DELETE_multi(self, multi):
         """Delete a multi."""
         if isinstance(multi.owner, Subreddit):
-            ModAction.create(multi.owner, c.user, 'removemultireddit',
-                             target=multi)
+            ModAction.create(multi.owner, c.user, 'removemultireddit')
         multi.delete()
 
     def _copy_multi(self, from_multi, to_path_info, rename=False):
@@ -376,8 +372,7 @@ class MultiApiController(RedditController):
         to_multi._commit()
 
         if isinstance(to_multi.owner, Subreddit):
-            ModAction.create(to_multi.owner, c.user, 'addmultireddit',
-                             target=multi)
+            ModAction.create(to_multi.owner, c.user, 'addmultireddit')
 
         return self._format_multi(to_multi)
 
@@ -413,11 +408,9 @@ class MultiApiController(RedditController):
         from_multi.delete()
 
         if isinstance(from_multi.owner, Subreddit):
-            ModAction.create(to_multi.owner, c.user, 'removemultireddit',
-                             target=multi)
+            ModAction.create(to_multi.owner, c.user, 'removemultireddit')
         if isinstance(to_multi.owner, Subreddit):
-            ModAction.create(to_multi.owner, c.user, 'addmultireddit',
-                             target=multi)
+            ModAction.create(to_multi.owner, c.user, 'addmultireddit',)
 
         #TODO: display "renamed" rather than create+delete
 
@@ -464,8 +457,7 @@ class MultiApiController(RedditController):
         if new:
             response.status = 201
             if isinstance(multi.owner, Subreddit):
-                ModAction.create(multi.owner, c.user, 'editmultireddit',
-                                 target=multi)
+                ModAction.create(multi.owner, c.user, 'editmultireddit')
 
         return self._get_multi_subreddit(multi, sr)
 
@@ -482,8 +474,7 @@ class MultiApiController(RedditController):
         existed = any(sr.name.lower() == sr_name.lower() for sr in multi.srs)
 
         if existed and isinstance(multi.owner, Subreddit):
-            ModAction.create(multi.owner, c.user, 'editmultireddit',
-                             target=multi)
+            ModAction.create(multi.owner, c.user, 'editmultireddit')
 
         multi.del_srs(sr)
         multi._commit()
@@ -518,8 +509,7 @@ class MultiApiController(RedditController):
         multi.description_md = data['body_md']
 
         if isinstance(multi.owner, Subreddit):
-                ModAction.create(multi.owner, c.user, 'editmultireddit',
-                                 target=multi)
+                ModAction.create(multi.owner, c.user, 'editmultireddit')
 
         multi._commit()
         return self._format_multi_description(multi)
