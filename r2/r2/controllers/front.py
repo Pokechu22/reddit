@@ -904,6 +904,12 @@ class FrontController(RedditController):
         else:
             abort(404)
 
+    @validate(VSrModerator(perms='config'))
+    def GET_subreddit_multireddits(self):
+        if isinstance(c.site, FakeSubreddit):
+                return self.abort404()
+        return (params).render()
+
     def GET_awards(self):
         """The awards page."""
         return BoringPage(_("awards"), content=UserAwards()).render()
