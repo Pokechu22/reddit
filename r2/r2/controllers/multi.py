@@ -116,6 +116,7 @@ class MultiApiController(RedditController):
         sr=VSRByName('srname'),
         expand_srs=VBoolean("expand_srs"),
     )
+    @api_doc(api_section.multis, uri="/api/multi/r/{srname}")
     def GET_list_sr_multis(self, sr, expand_srs):
         """Fetch a list of public multis belonging to subreddit `srname`"""
         multis = LabeledMulti.by_owner(sr)
