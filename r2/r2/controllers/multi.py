@@ -30,6 +30,7 @@ from r2.controllers.api_docs import api_doc, api_section
 from r2.controllers.reddit_base import RedditController, abort_with_error
 from r2.controllers.oauth2 import require_oauth2_scope
 from r2.models.account import Account
+from r2.models.modaction import ModAction
 from r2.models.subreddit import (
     FakeSubreddit,
     Subreddit,
@@ -256,6 +257,11 @@ class MultiApiController(RedditController):
             raise RedditError('MULTI_EXISTS', code=409, fields='multipath')
 
         self._write_multi_data(multi, data)
+
+        if isinstance(owner, Subreddit):
+            ModAction.create(owner, c.user, 'addmultireddit',
+                             target=multi)
+
         return self._format_multi(multi)
 
     @require_oauth2_scope("subscribe")
@@ -273,9 +279,17 @@ class MultiApiController(RedditController):
 
         try:
             multi = LabeledMulti._byID(path_info['path'])
+
+            if isinstance(owner, Subreddit):
+                ModAction.create(owner, c.user, 'editmultireddit',
+                                 target=multi)
         except tdb_cassandra.NotFound:
             multi = LabeledMulti.create(path_info['path'], owner)
             response.status = 201
+
+            if isinstance(owner, Subreddit):
+                ModAction.create(owner, c.user, 'addmultireddit',
+                                 target=multi)
 
         self._write_multi_data(multi, data)
         return self._format_multi(multi)
@@ -289,6 +303,9 @@ class MultiApiController(RedditController):
     @api_doc(api_section.multis, extends=GET_multi)
     def DELETE_multi(self, multi):
         """Delete a multi."""
+        if isinstance(multi.owner, Subreddit):
+            ModAction.create(multi.owner, c.user, 'removemultireddit',
+                             target=multi)
         multi.delete()
 
     def _copy_multi(self, from_multi, to_path_info, rename=False):
@@ -357,6 +374,10 @@ class MultiApiController(RedditController):
             to_multi.display_name = display_name
         to_multi._commit()
 
+        if isinstance(to_multi.owner, Subreddit):
+            ModAction.create(to_multi.owner, c.user, 'addmultireddit',
+                             target=multi)
+
         return self._format_multi(to_multi)
 
     @require_oauth2_scope("subscribe")
@@ -389,6 +410,15 @@ class MultiApiController(RedditController):
             to_multi.display_name = display_name
             to_multi._commit()
         from_multi.delete()
+
+        if isinstance(from_multi.owner, Subreddit):
+            ModAction.create(to_multi.owner, c.user, 'removemultireddit',
+                             target=multi)
+        if isinstance(to_multi.owner, Subreddit):
+            ModAction.create(to_multi.owner, c.user, 'addmultireddit',
+                             target=multi)
+
+        #TODO: display "renamed" rather than create+delete
 
         return self._format_multi(to_multi)
 
@@ -432,6 +462,9 @@ class MultiApiController(RedditController):
 
         if new:
             response.status = 201
+            if isinstance(multi.owner, Subreddit):
+                ModAction.create(multi.owner, c.user, 'editmultireddit',
+                                 target=multi)
 
         return self._get_multi_subreddit(multi, sr)
 
@@ -445,6 +478,12 @@ class MultiApiController(RedditController):
     @api_doc(api_section.multis, extends=GET_multi_subreddit)
     def DELETE_multi_subreddit(self, multi, sr):
         """Remove a subreddit from a multi."""
+        existed = any(sr.name.lower() == sr_name.lower() for sr in multi.srs)
+
+        if existed and isinstance(multi.owner, Subreddit):
+            ModAction.create(multi.owner, c.user, 'editmultireddit',
+                             target=multi)
+
         multi.del_srs(sr)
         multi._commit()
 
@@ -476,5 +515,10 @@ class MultiApiController(RedditController):
     def PUT_multi_description(self, multi, data):
         """Change a multi's markdown description."""
         multi.description_md = data['body_md']
+
+        if isinstance(multi.owner, Subreddit):
+                ModAction.create(multi.owner, c.user, 'editmultireddit',
+                                 target=multi)
+
         multi._commit()
         return self._format_multi_description(multi)
