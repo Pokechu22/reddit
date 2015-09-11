@@ -908,7 +908,7 @@ class FrontController(RedditController):
     def GET_subreddit_multireddits(self):
         if isinstance(c.site, FakeSubreddit):
                 return self.abort404()
-        return SubredditMultireddits().render()
+        return Reddit(content=SubredditMultireddits()).render()
 
     def GET_awards(self):
         """The awards page."""
