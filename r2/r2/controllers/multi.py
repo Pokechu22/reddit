@@ -538,11 +538,9 @@ class MultiApiController(RedditController):
         multi.description_md = data['body_md']
 
         if isinstance(multi.owner, Subreddit):
-                if isinstance(multi.owner, Subreddit):
-                ModAction.create(owner, c.user, 'editmultireddit',
-                             description=_('edited description of '
-                                           '%(multipath)') % \
-                                dict(multipath=multi.path))
+            ModAction.create(owner, c.user, 'editmultireddit',
+                         description=_('edited description of %(multipath)' % \
+                            dict(multipath=multi.path))
 
         multi._commit()
         return self._format_multi_description(multi)
