@@ -306,10 +306,10 @@ class MultiApiController(RedditController):
     @api_doc(api_section.multis, extends=GET_multi)
     def DELETE_multi(self, multi):
         """Delete a multi."""
-        if isinstance(owner, Subreddit):
-                ModAction.create(owner, c.user, 'removemultireddit',
-                                 description=_('removed %(multipath)s') % \
-                                     dict(multipath=path_info['path']))
+        if isinstance(multi.owner, Subreddit):
+            ModAction.create(multi.owner, c.user, 'removemultireddit',
+                             description=_('removed %(multipath)s') % \
+                                 dict(multipath=path_info['path']))
         multi.delete()
 
     def _copy_multi(self, from_multi, to_path_info, rename=False):
@@ -379,12 +379,11 @@ class MultiApiController(RedditController):
         to_multi._commit()
 
         if isinstance(to_multi.owner, Subreddit):
-            if isinstance(owner, Subreddit):
-                ModAction.create(owner, c.user, 'addmultireddit',
-                                 description=_('copied %(to_multipath)s from '
-                                 '%(from_multipath)s') % \
-                                     dict(to_multipath=to_path_info['path'],
-                                          from_multpath=from_path))
+            ModAction.create(to_multi.owner, c.user, 'addmultireddit',
+                             description=_('copied %(to_multipath)s from '
+                             '%(from_multipath)s') % \
+                                 dict(to_multipath=to_path_info['path'],
+                                      from_multpath=from_path))
 
         return self._format_multi(to_multi)
 
@@ -420,19 +419,17 @@ class MultiApiController(RedditController):
         from_multi.delete()
 
         if isinstance(from_multi.owner, Subreddit):
-            if isinstance(owner, Subreddit):
-                ModAction.create(owner, c.user, 'removemultireddit',
-                             description=_('removed %(from_multipath)s to '
-                                           'rename to %(to_multipath)s') % \
-                                dict(from_multipath=from_multi.path,
-                                     to_multipath=to_path_info['path']))
+            ModAction.create(from_multi.owner, c.user, 'removemultireddit',
+                     description=_('removed %(from_multipath)s to '
+                                   'rename to %(to_multipath)s') % \
+                        dict(from_multipath=from_multi.path,
+                                 to_multipath=to_path_info['path']))
         if isinstance(to_multi.owner, Subreddit):
-            if isinstance(owner, Subreddit):
-                ModAction.create(owner, c.user, 'addmultireddit',
-                             description=_('added %(from_multipath)s from '
-                                           'renamed %(to_multipath)s') % \
-                                dict(from_multipath=from_multi.path,
-                                     to_multipath=to_path_info['path']))
+            ModAction.create(to_multi.owner, c.user, 'addmultireddit',
+                         description=_('added %(from_multipath)s from '
+                                       'renamed %(to_multipath)s') % \
+                            dict(from_multipath=from_multi.path,
+                                 to_multipath=to_path_info['path']))
 
         #TODO: display "renamed" rather than create+delete
 
@@ -479,7 +476,7 @@ class MultiApiController(RedditController):
         if new:
             response.status = 201
             if isinstance(multi.owner, Subreddit):
-                ModAction.create(owner, c.user, 'editmultireddit',
+                ModAction.create(multi.owner, c.user, 'editmultireddit',
                              description=_('added /r/%(srname)s to '
                                            '%(multipath)s') % \
                                 dict(srname=sr_name, multipath=multi.path))
@@ -499,11 +496,10 @@ class MultiApiController(RedditController):
         existed = any(sr.name.lower() == sr_name.lower() for sr in multi.srs)
 
         if existed and isinstance(multi.owner, Subreddit):
-            if isinstance(multi.owner, Subreddit):
-                ModAction.create(owner, c.user, 'editmultireddit',
-                             description=_('removed /r/%(srname)s from '
-                                           '%(multipath)s') % \
-                                dict(srname=sr, multipath=multi.path))
+            ModAction.create(multi.owner, c.user, 'editmultireddit',
+                         description=_('removed /r/%(srname)s from '
+                                       '%(multipath)s') % \
+                            dict(srname=sr, multipath=multi.path))
 
         multi.del_srs(sr)
         multi._commit()
@@ -538,7 +534,7 @@ class MultiApiController(RedditController):
         multi.description_md = data['body_md']
 
         if isinstance(multi.owner, Subreddit):
-            ModAction.create(owner, c.user, 'editmultireddit',
+            ModAction.create(multi.owner, c.user, 'editmultireddit',
                              description=_('edited description of '
                                            '%(multipath)s') % \
                                  dict(multipath=multi.path))
