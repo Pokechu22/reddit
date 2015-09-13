@@ -309,7 +309,7 @@ class MultiApiController(RedditController):
         if isinstance(multi.owner, Subreddit):
             ModAction.create(multi.owner, c.user, 'removemultireddit',
                              description=_('removed %(multipath)s') % \
-                                 dict(multipath=path_info['path']))
+                                 dict(multipath=multi.path))
         multi.delete()
 
     def _copy_multi(self, from_multi, to_path_info, rename=False):
@@ -383,7 +383,7 @@ class MultiApiController(RedditController):
                              description=_('copied %(to_multipath)s from '
                              '%(from_multipath)s') % \
                                  dict(to_multipath=to_path_info['path'],
-                                      from_multpath=from_path))
+                                      from_multipath=from_path))
 
         return self._format_multi(to_multi)
 
@@ -493,13 +493,13 @@ class MultiApiController(RedditController):
     @api_doc(api_section.multis, extends=GET_multi_subreddit)
     def DELETE_multi_subreddit(self, multi, sr):
         """Remove a subreddit from a multi."""
-        existed = any(sr.name.lower() == sr_name.lower() for sr in multi.srs)
+        existed = sr in multi.srs
 
         if existed and isinstance(multi.owner, Subreddit):
             ModAction.create(multi.owner, c.user, 'editmultireddit',
                          description=_('removed /r/%(srname)s from '
                                        '%(multipath)s') % \
-                            dict(srname=sr, multipath=multi.path))
+                            dict(srname=sr.name, multipath=multi.path))
 
         multi.del_srs(sr)
         multi._commit()
