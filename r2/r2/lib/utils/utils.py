@@ -57,6 +57,7 @@ from r2.lib.contrib import ipaddress
 from r2.lib.filters import _force_unicode, _force_utf8
 from r2.lib.require import require, require_split, RequirementException
 from r2.lib.utils._utils import *
+from r2.models.subreddit import Subreddit, LabeledMulti
 
 iters = (list, tuple, set)
 
@@ -759,8 +760,15 @@ class UrlParser(object):
         Adds the subreddit's path to the path if another subreddit's
         prefix is not already present.
         """
+
+        # Ensure subreddit multireddits use their owner as otherwise
+        # pagination breaks
+        if isinstance(subreddit, LabeledMulti)
+                and isinstance(subreddit.owner, Subreddit):
+            subreddit = subreddit.owner
+
         if not (self.path_has_subreddit()
-                or self.path.startswith(subreddit.user_path)):
+                or self.path.lower().startswith(subreddit.user_path.lower())):
             self.path = (subreddit.user_path + self.path)
         return self
 
