@@ -5402,4 +5402,7 @@ class ShareClose(Templated):
     pass
 
 class SubredditMultireddits(Templated):
-    pass
+    def __init__(self, multis):
+        self.multis = multis
+        
+        Templated.__init__(self)
