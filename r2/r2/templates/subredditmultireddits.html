@@ -20,4 +20,20 @@
 ## reddit Inc. All Rights Reserved.
 ###############################################################################
 
-<div style="background-color:#FF0000; width:100%; padding-top: .5em; padding-bottom: .5em; font-size:2em; font-weight: bold; text-align: center;">NOT YET IMPLEMENTED</div>
+<ul>
+  %for multi in thing.multis: 
+    <li>
+      <a href="${multi.user_path}" target="_blank">${multi.name}</a></li>
+    </li>
+  %endfor
+  %if not thing.things:
+    <p id="noresults" class="error">${_("there doesn't seem to be anything here")}</p>
+  %endif
+  <li class="create">
+    <form>
+      <input type="text" class="multi-name" placeholder="${_('name')}"></input>
+      <div class="error"></div>
+      <button>${_('create')}</button><div class="throbber"></div>
+    </form>
+  </li>
+</ul>
