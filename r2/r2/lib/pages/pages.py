@@ -5402,7 +5402,8 @@ class ShareClose(Templated):
     pass
 
 class SubredditMultireddits(Templated):
-    def __init__(self, multis):
+    def __init__(self, multis, show_edit_buttons):
         self.multis = multis
+        self.show_edit_buttons = show_edit_buttons
         
         Templated.__init__(self)

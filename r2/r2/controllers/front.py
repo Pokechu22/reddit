@@ -904,15 +904,23 @@ class FrontController(RedditController):
         else:
             abort(404)
 
-    @validate(VSrModerator(perms='config'))
+    #TODO: Check if validation is needed for viewing the subreddit.
     def GET_subreddit_multireddits(self):
         if isinstance(c.site, FakeSubreddit):
                 return self.abort404()
 
-        multis = LabeledMulti.by_owner(c.site)
+        multis = [multi for multi in LabeledMulti.by_owner(c.site)
+                  if multi.can_view(c.user)]
 
-        return Reddit(title=_('subreddit multireddits - /r/%s' % c.site.name),
-                      content=SubredditMultireddits(multis)).render()
+        can_edit = not (c.user_is_loggedin
+                        and c.site.is_moderator_with_perms(c.user, 'config')
+                        or c.user_is_admin)
+
+        return Reddit(
+            title=_('subreddit multireddits - /r/%s' % c.site.name),
+            content=SubredditMultireddits(multis=multis,
+                                          show_edit_buttons=can_edit)
+        ).render()
 
     def GET_awards(self):
         """The awards page."""
