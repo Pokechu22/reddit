@@ -20,11 +20,22 @@
 ## reddit Inc. All Rights Reserved.
 ###############################################################################
 
+<%namespace file="utils.html" import="thing_timestamp, plain_link"/>
+%>
+<%def name="multi_entry(multi)">
+  <li>
+    ${plain_link(multi.name, multi.path)}
+    
+    <span class="age">
+      ${_("a multireddit for")}&#32;${thing_timestamp(thing.multi)}
+    </span>
+  </li>
+</%def>
+## %>
+
 <ul>
   %for multi in thing.multis: 
-    <li>
-      <a href="${multi.user_path}" target="_blank">${multi.name}</a></li>
-    </li>
+    ${multi_entry(multi)}
   %endfor
   %if not thing.multis:
     <p id="noresults" class="error">${_("there doesn't seem to be anything here")}</p>
