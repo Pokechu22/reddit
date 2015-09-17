@@ -911,7 +911,8 @@ class FrontController(RedditController):
 
         multis = LabeledMulti.by_owner(c.site)
 
-        return Reddit(content=SubredditMultireddits(multis)).render()
+        return Reddit(title=_('subreddit multireddits - /r/%s' % c.site.name),
+                      content=SubredditMultireddits(multis)).render()
 
     def GET_awards(self):
         """The awards page."""
