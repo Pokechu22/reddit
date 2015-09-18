@@ -21,17 +21,16 @@
 ###############################################################################
 
 <%namespace file="utils.html" import="thing_timestamp, plain_link"/>
-%>
+
 <%def name="multi_entry(multi)">
   <li>
-    ${plain_link(multi.name, multi.path)}
+    ${plain_link(multi.name, multi.path)}&#32;
     
     <span class="age">
-      ${_("a multireddit for")}&#32;${thing_timestamp(thing.multi)}
+      ${_("a multireddit for")}&#32;${thing_timestamp(multi)}
     </span>
   </li>
 </%def>
-## %>
 
 <ul>
   %for multi in thing.multis: 
