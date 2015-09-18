@@ -904,17 +904,18 @@ class FrontController(RedditController):
         else:
             abort(404)
 
-    #TODO: Check if validation is needed for viewing the subreddit.
     def GET_subreddit_multireddits(self):
+        """Page for viewing and editing multireddits owned by a subreddit."""
+
         if isinstance(c.site, FakeSubreddit):
                 return self.abort404()
 
         multis = [multi for multi in LabeledMulti.by_owner(c.site)
                   if multi.can_view(c.user)]
 
-        can_edit = not (c.user_is_loggedin
-                        and c.site.is_moderator_with_perms(c.user, 'config')
-                        or c.user_is_admin)
+        can_edit = (c.user_is_loggedin
+                    and c.site.is_moderator_with_perms(c.user, 'config')
+                    or c.user_is_admin)
 
         return Reddit(
             title=_('subreddit multireddits - /r/%s' % c.site.name),
