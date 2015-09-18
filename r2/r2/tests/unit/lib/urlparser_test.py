@@ -24,8 +24,11 @@
 import unittest
 
 from r2.lib.utils import UrlParser
+from r2.models.account import Account
+from r2.models.subreddit import Subreddit
 from r2.tests import RedditTestCase
 from pylons import app_globals as g
+from pylons import tmpl_context as c
 
 
 class TestIsRedditURL(RedditTestCase):
@@ -291,4 +294,102 @@ class TestEquality(unittest.TestCase):
         u = UrlParser(u'http://example.com/?page=ｕｎｉｃｏｄｅ：（')
         u2 = UrlParser('http://example.com/')
         u2.update_query(page=u'ｕｎｉｃｏｄｅ：（')
+        self.assertEquals(u, u2)
+
+class TestAddSubreddit(unittest.TestCase):
+    def setUp(self):
+        self._old_user = c.user
+        self.sr = Subreddit(name = 'subreddit')
+        account1 = Account(name = 'user1')
+        account2 = Account(name = 'user2')
+        self.my_multi = LabeledMulti(name = 'multi', owner = account1)
+        self.user_multi = LabeledMulti(name = 'lowercase', owner = account2)
+        self.sr_multi =  LabeledMulti(name = 'UPPERCASE', owner = sr)
+        c.user = account2
+
+    def tearDown(self):
+        c.user = self._old_user
+
+    def test_add_sr(self):
+        u = UrlParser(u'/top')
+        u2 = UrlParser(u'/r/subreddit/top')
+        u.path_add_subreddit(self.sr)
+        self.assertEquals(u, u2)
+
+    def test_existing_sr(self):
+        u = UrlParser(u'/r/subreddit/top')
+        u2 = UrlParser(u'/r/subreddit/top')
+        u.path_add_subreddit(self.sr)
+        self.assertEquals(u, u2)
+
+    def test_my_multi(self):
+        u = UrlParser(u'/me/m/multi/top')
+        u2 = UrlParser(u'/me/m/multi/top')
+        u.path_add_subreddit(self.my_multi)
+        self.assertEquals(u, u2)
+
+    def test_add_my_multi(self):
+        u = UrlParser(u'/top')
+        u2 = UrlParser(u'/me/m/multi/top')
+        u.path_add_subreddit(self.my_multi)
+        self.assertEquals(u, u2)
+
+    def test_other_multi(self):
+        u = UrlParser(u'/user/user2/m/multi/top')
+        u2 = UrlParser(u'/user/user2/m/multi/top')
+        u.path_add_subreddit(self.user_multi)
+        self.assertEquals(u, u2)
+
+    def test_add_other_multi(self):
+        u = UrlParser(u'/top')
+        u2 = UrlParser(u'/user/user2/m/lowercase/top')
+        u.path_add_subreddit(self.user_multi)
+        self.assertEquals(u, u2)
+
+    def test_other_multi_caps(self):
+        u = UrlParser(u'/user/user2/m/LoWeRcAsE/top')
+        u2 = UrlParser(u'/user/user2/m/LoWeRcAsE/top')
+        u.path_add_subreddit(self.user_multi)
+        self.assertEquals(u, u2)
+
+    def test_other_multi_caps_username(self):
+        u = UrlParser(u'/user/USER2/m/lowercase/top')
+        u2 = UrlParser(u'/user/USER2/m/lowercase/top')
+        u.path_add_subreddit(self.user_multi)
+        self.assertEquals(u, u2)
+
+    def test_sr_multi(self):
+        u = UrlParser(u'/r/subreddit/m/UPPERCASE/top')
+        u2 = UrlParser(u'/r/subreddit/m/UPPERCASE/top')
+        u.path_add_subreddit(self.sr_multi)
+        self.assertEquals(u, u2)
+
+    def test_add_sr_multi(self):
+        u = UrlParser(u'/top')
+        u2 = UrlParser(u'/r/subreddit/m/UPPERCASE/top')
+        u.path_add_subreddit(self.sr_multi)
+        self.assertEquals(u, u2)
+
+    def test_sr_multi_caps(self):
+        u = UrlParser(u'/r/SUBREDDIT/m/UPPERCASE/top')
+        u2 = UrlParser(u'/r/SUBREDDIT/m/UPPERCASE/top')
+        u.path_add_subreddit(self.sr_multi)
+        self.assertEquals(u, u2)
+
+    def test_sr_multi_caps_2(self):
+        u = UrlParser(u'/r/subreddit/m/UpperCase/top')
+        u2 = UrlParser(u'/r/subreddit/m/UpperCase/top')
+        u.path_add_subreddit(self.sr_multi)
+        self.assertEquals(u, u2)
+
+    def test_sr_multi_caps_2(self):
+        u = UrlParser(u'/r/subreddit/m/UpperCase/top')
+        u2 = UrlParser(u'/r/subreddit/m/UpperCase/top')
+        u.path_add_subreddit(self.sr_multi)
+        self.assertEquals(u, u2)
+
+    def test_sr_multi_add_partial(self):
+        u = UrlParser(u'/m/UPPERCASE/top')
+        u2 = UrlParser(u'/r/subreddit/m/UPPERCASE/top')
+        u.path_add_subreddit(self.sr_multi)
         self.assertEquals(u, u2)
