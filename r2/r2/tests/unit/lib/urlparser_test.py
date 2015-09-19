@@ -25,7 +25,7 @@ import unittest
 
 from r2.lib.utils import UrlParser
 from r2.models.account import Account
-from r2.models.subreddit import Subreddit
+from r2.models.subreddit import Subreddit, LabeledMulti
 from r2.tests import RedditTestCase
 from pylons import app_globals as g
 from pylons import tmpl_context as c
@@ -304,7 +304,7 @@ class TestAddSubreddit(unittest.TestCase):
         account2 = Account(name = 'user2')
         self.my_multi = LabeledMulti(name = 'multi', owner = account1)
         self.user_multi = LabeledMulti(name = 'lowercase', owner = account2)
-        self.sr_multi =  LabeledMulti(name = 'UPPERCASE', owner = sr)
+        self.sr_multi =  LabeledMulti(name = 'UPPERCASE', owner = self.sr)
         c.user = account2
 
     def tearDown(self):
