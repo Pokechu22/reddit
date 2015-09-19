@@ -299,16 +299,38 @@ class TestEquality(unittest.TestCase):
 class TestAddSubreddit(unittest.TestCase):
     def setUp(self):
         self._old_user = c.user
-        self.sr = Subreddit(name = 'subreddit')
-        account1 = Account(name = 'user1')
-        account2 = Account(name = 'user2')
-        self.my_multi = LabeledMulti(name = 'multi', owner = account1)
-        self.user_multi = LabeledMulti(name = 'lowercase', owner = account2)
-        self.sr_multi =  LabeledMulti(name = 'UPPERCASE', owner = self.sr)
+
+        self.sr = Subreddit(name = 'subreddit', _id = 1)
+        self.account1 = Account(name = 'user1', _id = 2)
+        self.account2 = Account(name = 'user2', _id = 3)
+
+        self.sr._commit()
+        self.account1._commit()
+        self.account2._commit()
+
+        self.my_multi = LabeledMulti(_id = '/user/user1/m/multi',
+                                     owner_fullname = self.account1._fullname)
+        self.user_multi = LabeledMulti(_id = '/user/user2/m/lowercase',
+                                       owner_fullname = self.account2._fullname)
+        self.sr_multi = LabeledMulti(name = '/r/subreddit/m/UPPERCASE',
+                                     owner_fullname = self.sr._fullname)
+
+        self.my_multi._commit()
+        self.user_multi._commit()
+        self.sr_multi._commit()
+
         c.user = account2
 
     def tearDown(self):
         c.user = self._old_user
+
+        self.sr._destroy()
+        self.account1._destroy()
+        self.account2._destroy()
+
+        self.my_multi._destroy()
+        self.user_multi._destroy()
+        self.sr_multi._destroy()
 
     def test_add_sr(self):
         u = UrlParser(u'/top')
