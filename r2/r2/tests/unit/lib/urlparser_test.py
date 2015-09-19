@@ -23,6 +23,7 @@
 ###############################################################################
 import unittest
 
+from mock import Mock
 from r2.lib.utils import UrlParser
 from r2.models.account import Account
 from r2.models.subreddit import Subreddit, LabeledMulti
@@ -298,17 +299,15 @@ class TestEquality(unittest.TestCase):
 
 class TestAddSubreddit(unittest.TestCase):
     def setUp(self):
-        self._old_user = c.user
         self.sr = Subreddit(name = 'subreddit')
         account1 = Account(name = 'user1')
         account2 = Account(name = 'user2')
         self.my_multi = LabeledMulti(name = 'multi', owner = account1)
+        self.my_multi.path = Mock(return_value = '/user/user1/m/multi')
         self.user_multi = LabeledMulti(name = 'lowercase', owner = account2)
+        self.user_multi.path = Mock(return_value='/user/user2/m/lowercase')
         self.sr_multi =  LabeledMulti(name = 'UPPERCASE', owner = self.sr)
-        c.user = account2
-
-    def tearDown(self):
-        c.user = self._old_user
+        self.user_multi.path = Mock(return_value='/r/subreddit/m/UPPERCASE')
 
     def test_add_sr(self):
         u = UrlParser(u'/top')
