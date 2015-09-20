@@ -303,7 +303,6 @@ class TestAddSubreddit(unittest.TestCase):
         account2 = Account(name = 'user2')
         self.my_multi = LabeledMulti(name = 'multi')
         self.my_multi._owner = account1
-        self.my_multi.user_path = Mock(return_value = '/user/test1/m/multi')
         self.user_multi = LabeledMulti(name = 'lowercase', owner = account2)
         self.user_multi._owner = account2
         self.sr_multi = LabeledMulti(name = 'UPPERCASE', owner = self.sr)
@@ -311,8 +310,8 @@ class TestAddSubreddit(unittest.TestCase):
 
     def tearDown(self):
         del self.my_multi
-        del user_multi
-        del sr_multi
+        del self.user_multi
+        del self.sr_multi
 
     def test_add_sr(self):
         u = UrlParser(u'/top')
