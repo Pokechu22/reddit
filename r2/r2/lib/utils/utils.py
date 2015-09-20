@@ -763,7 +763,8 @@ class UrlParser(object):
 
         # Ensure subreddit multireddits use their owner as otherwise
         # pagination breaks
-        if (isinstance(subreddit, LabeledMulti)
+        if (self.path.lower().startswith('/m/')
+                and isinstance(subreddit, LabeledMulti)
                 and isinstance(subreddit.owner, Subreddit)):
             subreddit = subreddit.owner
 
