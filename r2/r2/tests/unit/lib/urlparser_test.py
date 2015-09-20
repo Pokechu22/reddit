@@ -23,7 +23,6 @@
 ###############################################################################
 import unittest
 
-from mock import Mock
 from r2.lib.utils import UrlParser
 from r2.models.account import Account
 from r2.models.subreddit import Subreddit, LabeledMulti
@@ -302,12 +301,18 @@ class TestAddSubreddit(unittest.TestCase):
         self.sr = Subreddit(name = 'subreddit')
         account1 = Account(name = 'user1')
         account2 = Account(name = 'user2')
-        self.my_multi = LabeledMulti(name = 'multi', owner = account1)
-        self.my_multi.path = Mock(return_value = '/user/user1/m/multi')
+        self.my_multi = LabeledMulti(name = 'multi')
+        self.my_multi._owner = account1
+        self.my_multi.user_path = Mock(return_value = '/user/test1/m/multi')
         self.user_multi = LabeledMulti(name = 'lowercase', owner = account2)
-        self.user_multi.path = Mock(return_value='/user/user2/m/lowercase')
-        self.sr_multi =  LabeledMulti(name = 'UPPERCASE', owner = self.sr)
-        self.user_multi.path = Mock(return_value='/r/subreddit/m/UPPERCASE')
+        self.user_multi._owner = account2
+        self.sr_multi = LabeledMulti(name = 'UPPERCASE', owner = self.sr)
+        self.sr_multi._owner = self.sr
+
+    def tearDown(self):
+        del self.my_multi
+        del user_multi
+        del sr_multi
 
     def test_add_sr(self):
         u = UrlParser(u'/top')
