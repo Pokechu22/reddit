@@ -105,11 +105,24 @@ class MultiApiController(RedditController):
     @validate(
         user=VAccountByName("username"),
         expand_srs=VBoolean("expand_srs"),
+        include_mod_srs=VBoolean("include_mod_srs",
+                docs={"include_mod_srs": "include subreddit multireddits from subreddits moderated by this user"})
     )
     @api_doc(api_section.multis, uri="/api/multi/user/{username}")
-    def GET_list_multis(self, user, expand_srs):
+    def GET_list_multis(self, user, expand_srs, include_mod_srs):
         """Fetch a list of public multis belonging to `username`"""
         multis = LabeledMulti.by_owner(user)
+
+        if include_mod_srs:
+            mod_sr_ids = Subreddit.reverse_moderator_ids(user)
+            all_mod_srs = Subreddit._byID(mod_sr_ids, data=True,
+                                            return_dict=False, stale=True)
+            mod_srs = [sr for sr in all_mod_srs if sr.can_view(c.user)
+                       and sr.is_moderator_with_perms(user, 'config')]
+
+            for sr in mod_srs:
+                multis += LabeledMulti.by_owner(sr)
+
         return self._format_multi_list(multis, c.user, expand_srs)
 
     @require_oauth2_scope("read")
@@ -124,11 +137,27 @@ class MultiApiController(RedditController):
         return self._format_multi_list(multis, c.user, expand_srs)
 
     @require_oauth2_scope("read")
-    @validate(VUser(), expand_srs=VBoolean("expand_srs"))
+    @validate(
+        VUser(),
+        expand_srs=VBoolean("expand_srs")
+        include_mod_srs=VBoolean("include_mod_srs",
+                docs={"include_mod_srs": "include subreddit multireddits from subreddits moderated by this user"})
+    )
     @api_doc(api_section.multis, uri="/api/multi/mine")
-    def GET_my_multis(self, expand_srs):
+    def GET_my_multis(self, expand_srs, include_mod_srs):
         """Fetch a list of multis belonging to the current user."""
         multis = LabeledMulti.by_owner(c.user)
+
+        if include_mod_srs:
+            mod_sr_ids = Subreddit.reverse_moderator_ids(c.user)
+            all_mod_srs = Subreddit._byID(mod_sr_ids, data=True,
+                                            return_dict=False, stale=True)
+            mod_srs = [sr for sr in all_mod_srs if sr.can_view(c.user)
+                       and sr.is_moderator_with_perms(c.user, 'config')]
+
+            for sr in mod_srs:
+                multis += LabeledMulti.by_owner(sr)
+
         return self._format_multi_list(multis, c.user, expand_srs)
 
     def _format_multi(self, multi, expand_sr_info=False):
