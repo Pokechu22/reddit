@@ -342,8 +342,8 @@ class TestAddSubreddit(unittest.TestCase):
         self.assertEquals(u, u2)
 
     def test_other_multi(self):
-        u = UrlParser(u'/user/user2/m/multi/top')
-        u2 = UrlParser(u'/user/user2/m/multi/top')
+        u = UrlParser(u'/user/user2/m/lowercase/top')
+        u2 = UrlParser(u'/user/user2/m/lowercase/top')
         u.path_add_subreddit(self.user_multi)
         self.assertEquals(u, u2)
 
