@@ -28,7 +28,6 @@ from r2.models.account import Account
 from r2.models.subreddit import Subreddit, LabeledMulti
 from r2.tests import RedditTestCase
 from pylons import app_globals as g
-from pylons import tmpl_context as c
 
 
 class TestIsRedditURL(RedditTestCase):
@@ -298,24 +297,22 @@ class TestEquality(unittest.TestCase):
 
 class TestAddSubreddit(unittest.TestCase):
     def setUp(self):
-        self._old_user = c.user
         self.sr = Subreddit(name = 'subreddit')
         account1 = Account(name = 'user1')
         account2 = Account(name = 'user2')
+
+        #TODO: Is setting _dirties the best way?
         self.my_multi = LabeledMulti()
-        self.my_multi._id = '/user/user1/m/multi'
+        self.my_multi._dirties['user_path'] = '/user/user1/m/multi'
         self.my_multi._owner = account1
         self.user_multi = LabeledMulti()
-        self.user_multi._id = '/user/user2/m/lowercase'
+        self.user_multi._dirties['user_path'] = '/user/user2/m/lowercase'
         self.user_multi._owner = account2
-        self.sr_multi = LabeledMulti(name = 'UPPERCASE', owner = self.sr)
-        self.sr_multi._id = '/r/subreddit/m/UPPERCASE'
+        self.sr_multi = LabeledMulti()
+        self.sr_multi._dirties['user_path'] = '/r/subreddit/m/UPPERCASE'
         self.sr_multi._owner = self.sr
-        c.user = account1
 
     def tearDown(self):
-        c.user = self._old_user
-
         del self.my_multi
         del self.user_multi
         del self.sr_multi
