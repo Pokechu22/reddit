@@ -311,6 +311,8 @@ class NavButton(Styled):
         self.path = base_path.replace('//', '/')
 
     def is_selected(self):
+        from r2.models.subreddit import Subreddit, LabeledMulti
+
         stripped_path = _force_unicode(request.path.rstrip('/').lower())
 
         if not (self.sr_path or c.default_sr):
@@ -324,6 +326,19 @@ class NavButton(Styled):
             return True
         if stripped_path in self.aliases:
             return True
+
+        if (self.sr_path and isinstance(c.site, LabeledMulti)
+                and isinstance(c.site.owner, Subreddit)):
+            owning_sr_path = c.site.owner.user_path.rstrip('/').lower()
+            multi_path = site_path.split(owning_sr_path, 1)[1]
+
+            if stripped_path == multi_path:
+                return True
+            if self.stripped_path.startswith(multi_path + self.bare_path):
+                return True
+            multi_aliases = [multi_path + alias for alias in self.aliases]
+            if stripped_path in multi_aliases:
+                return True
 
     def selected_title(self):
         """returns the title of the button when selected (for cases
