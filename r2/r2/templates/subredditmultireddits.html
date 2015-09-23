@@ -20,17 +20,10 @@
 ## reddit Inc. All Rights Reserved.
 ###############################################################################
 
-<%namespace file="utils.html" import="thing_timestamp, plain_link"/>
-
-<%def name="multi_entry(multi)">
-  <li>
-    ${plain_link(multi.name, multi.path)}&#32;
-    
-    <span class="age">
-      ${_("a multireddit for")}&#32;${thing_timestamp(multi)}
-    </span>
-  </li>
-</%def>
+<%!
+   from r2.lib.utils import timesince
+%>
+<%namespace file="utils.html" import="plain_link"/>
 
 <ul>
   %for multi in thing.multis: 
@@ -49,3 +42,48 @@
     </li>
   %endif
 </ul>
+
+<%def name="multi_entry(multi)">
+<li>
+  <p class="titlerow">
+    ${plain_link(multi.name, multi.path, _class="title")}
+    ${self.permission_icons()}
+  </p>
+  ${description = safemarkdown(multi.description_md)}
+  %if description:
+    <div class="description">
+      ${description}
+    </div>
+  %endif
+  <p class="tagline">
+    ${self.tagline()}
+  </p>
+  <ul class="flat-list buttons">
+    ##TODO
+  </ul>
+</li>
+</%def>
+
+<%def name="tagline()">
+  ${_("a multireddit for %(time)s") % dict(time=timesince(thing._date))}
+</%def>
+
+<%def name="sr_type_icon(name, title)">
+  <span class="sr-type-icon sr-type-icon-${name}"
+       title="${title}"
+       alt="${title}"></span>
+</%def>
+
+<%def name="permission_icons(multi)">
+  %if multi.moderator:
+    ${self.sr_type_icon("moderator", _("moderator"))}
+  %endif
+
+  %if not multi.is_public():
+    ${self.sr_type_icon("private", _("private"))}
+  %endif
+
+  %if multi.over_18:
+    ${self.sr_type_icon("nsfw", _("NSFW"))}
+  %endif
+</%def>
