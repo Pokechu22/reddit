@@ -139,7 +139,7 @@ class MultiApiController(RedditController):
     @require_oauth2_scope("read")
     @validate(
         VUser(),
-        expand_srs=VBoolean("expand_srs")
+        expand_srs=VBoolean("expand_srs"),
         include_mod_srs=VBoolean("include_mod_srs",
                 docs={"include_mod_srs": "include subreddit multireddits from subreddits moderated by this user"})
     )
