@@ -21,7 +21,6 @@
 ###############################################################################
 
 <%!
-   from r2.lib.pages import UserText
    from r2.lib.utils import timesince
 %>
 <%namespace file="utils.html" import="plain_link"/>
@@ -48,19 +47,27 @@
 <li>
   <p class="titlerow">
     ${plain_link(multi.name, multi.path, _class="title")}
-    ${self.permission_icons(multi)}
+    ${self.permission_icons()}
   </p>
-  <div class="description">
-    ${UserText(None, text=multi.description_md, post_form=None, editable=True, include_errors=False)}
-  </div>
+  ${description = safemarkdown(multi.description_md)}
+  %if description:
+    <div class="description">
+      ${description}
+    </div>
+  %endif
   <p class="tagline">
-    ${_("a multireddit for %(time)s") % dict(time=timesince(multi._date))}
+    ${self.tagline()}
   </p>
   <ul class="flat-list buttons">
     ##TODO
   </ul>
 </li>
 </%def>
+
+<%def name="tagline()">
+  ${_("a multireddit for %(time)s") % dict(time=timesince(thing._date))}
+</%def>
+
 <%def name="sr_type_icon(name, title)">
   <span class="sr-type-icon sr-type-icon-${name}"
        title="${title}"
@@ -68,7 +75,7 @@
 </%def>
 
 <%def name="permission_icons(multi)">
-  %if c.user_is_loggedin and multi.is_moderator(c.user):
+  %if multi.moderator:
     ${self.sr_type_icon("moderator", _("moderator"))}
   %endif
 
