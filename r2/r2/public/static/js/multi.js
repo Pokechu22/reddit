@@ -140,14 +140,14 @@ r.multi.MultiReddit = Backbone.Model.extend({
         this.subreddits.getByName(name).destroy(options)
     },
 
-    _copyOp: function(op, newCollection, newName, subreddit) {
+    _copyOp: function(op, newCollection, newName) {
         var deferred = new $.Deferred
         Backbone.ajax({
             type: 'POST',
             url: '/api/multi/' + op,
             data: {
                 from: this.get('path'),
-                to: newCollection.pathByName(newName, subreddit)
+                to: newCollection.pathByName(newName)
             },
             success: _.bind(function(resp) {
                 if (op == 'rename') {
@@ -162,8 +162,8 @@ r.multi.MultiReddit = Backbone.Model.extend({
         return deferred
     },
 
-    copyTo: function(newCollection, name, subreddit) {
-        return this._copyOp('copy', newCollection, name, subreddit)
+    copyTo: function(newCollection, name) {
+        return this._copyOp('copy', newCollection, name)
     },
 
     renameTo: function(newCollection, name) {
@@ -176,7 +176,7 @@ r.multi.MultiReddit = Backbone.Model.extend({
 })
 
 r.multi.MyMultiCollection = Backbone.Collection.extend({
-    url: '/api/multi/mine?include_mod_srs=true',
+    url: '/api/multi/mine',
     model: r.multi.MultiReddit,
     comparator: function(model) {
         return model.get('path').toLowerCase()
@@ -188,10 +188,7 @@ r.multi.MyMultiCollection = Backbone.Collection.extend({
         })
     },
 
-    pathByName: function(name, subredditName) {
-        if (subredditName) {
-            return '/r/' + subredditName + '/m/' + name
-        }
+    pathByName: function(name) {
         return '/user/' + r.config.logged + '/m/' + name
     }
 })
@@ -625,9 +622,9 @@ r.multi.MultiCreateForm = Backbone.View.extend({
         r.ui.showWorkingDeferred(this.$el, deferred)
     },
 
-    _createMulti: function(name, subreddit) {
+    _createMulti: function(name) {
         var newMulti = new r.multi.MultiReddit({
-                path: r.multi.mine.pathByName(name, subreddit)
+                path: r.multi.mine.pathByName(name)
             }, {isNew: true})
 
         var deferred = new $.Deferred
@@ -652,8 +649,8 @@ r.multi.MultiCreateForm = Backbone.View.extend({
 })
 
 r.multi.MultiCopyForm = r.multi.MultiCreateForm.extend({
-    _createMulti: function(name, subreddit) {
-        return this.options.sourceMulti.copyTo(r.multi.mine, name, subreddit)
+    _createMulti: function(name) {
+        return this.options.sourceMulti.copyTo(r.multi.mine, name)
     }
 })
 
