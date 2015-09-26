@@ -2080,7 +2080,7 @@ a.star { text-decoration: none; color: #ff8b60 }
 .link.compressed .title { margin: -2px 0 3px }
 .link.compressed .score { color: #888888 }
 .link.compressed .score-placeholder { height: 3px }
-.link.compressed .subreddit { font-weight: bold }
+.link.compressed .subreddit, .link.compressed .multireddit { font-weight: bold }
 .link.compressed .tagline { display: inline; margin-right: 12px }
 .link.compressed .expando-button { display: none; }
 
@@ -2630,12 +2630,36 @@ textarea.gray { color: gray; }
     margin-top: 0.5em;
 }
 
-.subreddit { margin-bottom: 10px; }
-.subreddit p { margin-top: 0px; margin-bottom: 1px; }
-.subreddit .description {font-size: small; max-width: 60em;}
-.subreddit .key {display: block;}
-.subreddit .title { font-size: medium; margin-right: 5px; }
-.subreddit .midcol { margin-right: 5px; margin-top: 5px; text-align: right; width: 12em !important; }
+.subreddit,
+.multireddit {
+    margin-bottom: 10px;
+}
+.subreddit p ,
+.multireddit p {
+    margin-top: 0px;
+    margin-bottom: 1px;
+}
+.subreddit .description,
+.multireddit .description {
+    font-size: small;
+    max-width: 60em;
+}
+.subreddit .key ,
+.multireddit .p {
+    display: block;
+}
+.subreddit .title,
+.multireddit .title {
+    font-size: medium;
+    margin-right: 5px;
+}
+.subreddit .midcol,
+.multireddit .title {
+    margin-right: 5px;
+    margin-top: 5px;
+    text-align: right;
+    width: 12em !important;
+}
 
 .fancy-toggle-button {
     display: block;
@@ -5091,7 +5115,8 @@ ul.tabmenu.formtab {
 
 
 /******** self text stuff ****/
-.subreddit .usertext .md {
+.subreddit .usertext .md,
+.multireddit .usertext .md {
     padding: 2px 5px;
     background-color: #fafafa;
     border: 1px solid #CCC;
@@ -11168,4 +11193,8 @@ body:not(.loggedin) .report-button {
 
 .subreddit .midcol .sr-type-icon {
     margin-left: 3px;
+}
+
+.multireddit .sr-type-icon {
+    margin-right: 3px;
 }
