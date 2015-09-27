@@ -334,7 +334,7 @@ class NavButton(Styled):
 
             if stripped_path == multi_path:
                 return True
-            if self.stripped_path.startswith(multi_path + self.bare_path):
+            if stripped_path.startswith(multi_path + self.bare_path):
                 return True
             multi_aliases = [multi_path + alias for alias in self.aliases]
             if stripped_path in multi_aliases:
