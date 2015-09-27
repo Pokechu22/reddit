@@ -176,7 +176,7 @@ r.multi.MultiReddit = Backbone.Model.extend({
 })
 
 r.multi.MyMultiCollection = Backbone.Collection.extend({
-    url: '/api/multi/mine',
+    url: '/api/multi/mine?include_mod_srs=true',
     model: r.multi.MultiReddit,
     comparator: function(model) {
         return model.get('path').toLowerCase()
