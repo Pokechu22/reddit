@@ -5323,6 +5323,14 @@ class ListingSuggestions(Templated):
                     self.suggestions = random.sample(multis, 3)
             else:
                 self.suggestion_type = "random"
+        elif isinstance(c.site, Subreddit):
+            sr_multis = LabeledMulti.by_owner(c.site, load_subreddits = False)
+            if sr_multis:
+                self.suggestion_type = "multis"
+                if len(sr_multis) <= 3:
+                    self.suggestions = sr_multis
+                else:
+                    self.suggestions = sr_multis
 
 
 class UnreadMessagesSuggestions(Templated):
