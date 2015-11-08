@@ -24,7 +24,50 @@
    from r2.lib.pages import UserText
    from r2.lib.utils import timesince
 %>
-<%namespace file="utils.html" import="plain_link"/>
+<%namespace file="utils.html" import="plain_link, classes, error_field"/>
+
+%if thing.show_edit_buttons:
+  <div class="fancy-settings">
+    ${tool_toggler(True)}
+    ${tool_toggler(False)}
+    <div class="multireddit-create-field multireddit create">
+      <form action="/post/multi">
+        <div class="multireddit-settings">
+          <input type="text" size="16" class="multi-name" placeholder="${_('name')}" data-basepath="/r/${c.site.name}"></input>
+          <select class="nomargin" name="visibility" autocomplete="off">
+          <% visibility_options = ('private', 'hidden', 'public') %>
+            %for option in visibility_options:
+              <% selected = ' selected' if visibility_options.index(option) is 0 else ''%>
+              <option value="${option}"${selected}>
+                ${_(option)}
+              </option>
+            %endfor
+          </select>
+          <button class="multi-create">${_('create')}</button>
+          <div class="error"></div>
+          <div class="throbber"></div>
+        </div>
+        <div class="multireddit-subreddits">
+          ${subreddit_input()}
+          <ul class="subreddits">
+            <li>
+              <a href="/r/${c.site.name}">/r/${c.site.name}</a>
+              <button class="remove-sr multireddit-subreddit">x</button>
+            </li>
+          </ul>
+        </div>
+      </form>
+    </div>
+  </div>
+%endif
+
+<%def name="tool_toggler(make_visible)">
+  <%
+    visibility_class = "show" if make_visible else "hide"
+    text = _("Show Multireddit Creation Tool") if make_visible else _("Hide Multireddit Creation Tool")
+  %>
+  <h1 ${classes("multireddit-tool-toggle", visibility_class)}>${text}</h1>
+</%def>
 
 <ul class="subreddit-multireddit-list">
   %for multi in thing.multis:
@@ -33,34 +76,26 @@
   %if not thing.multis:
     <p id="noresults" class="error">${_("there doesn't seem to be anything here")}</p>
   %endif
-  %if thing.show_edit_buttons:
-    <li class="create">
-      <form action="/post/multi">
-        <input type="text" class="multi-name" placeholder="${_('name')}" data-basepath="/r/${c.site.name}"></input>
-        <div class="error"></div>
-        <button class="multi-create">${_('create')}</button><div class="throbber"></div>
-      </form>
-    </li>
-  %endif
 </ul>
 
 <%def name="multi_entry(multi)">
-<li class="multireddit">
-  <p class="titlerow">
-    ${plain_link(multi.name, multi.path, _class="title")}
-    ${self.permission_icons(multi)}
-  </p>
-  <div class="description">
-    ${UserText(None, text=multi.description_md, post_form=None, editable=True, include_errors=False)}
-  </div>
-  <p class="tagline">
-    ${_("a multireddit for %(time)s") % dict(time=timesince(multi._date))}
-  </p>
-  <ul class="flat-list buttons">
-    ##TODO
-  </ul>
-</li>
+  <li class="multireddit">
+    <p class="titlerow">
+      ${plain_link(multi.name, multi.path, _class="title")}
+      ${self.permission_icons(multi)}
+    </p>
+    <div class="description">
+      ${UserText(None, text=multi.description_md, post_form=None, editable=True, include_errors=False)}
+    </div>
+    <p class="tagline">
+      ${_("a multireddit for %(time)s") % dict(time=timesince(multi._date))}
+    </p>
+    <ul class="flat-list buttons">
+      ##TODO
+    </ul>
+  </li>
 </%def>
+
 <%def name="sr_type_icon(name, title)">
   <span class="sr-type-icon sr-type-icon-${name}"
        title="${title}"
@@ -79,4 +114,24 @@
   %if multi.over_18:
     ${self.sr_type_icon("nsfw", _("NSFW"))}
   %endif
+</%def>
+
+<%def name="subreddit_input()">
+  <div id="sr-autocomplete-area">
+    <input id="sr-autocomplete" name="sr" type="text"
+           autocomplete="off" onkeyup="sr_name_up(event)"
+           onkeydown="return sr_name_down(event)"
+           onblur="hide_sr_name_list()" class="sr-name"
+           placeholder="${_('add subreddit')}"/>
+    <button class="add multireddit-subreddit">${_("add")}</button>
+    <ul id="sr-drop-down">
+      <li class="sr-name-row"
+          onmouseover="highlight_reddit(this)"
+          onmousedown="return sr_dropdown_mdown(this)"
+          onmouseup="sr_dropdown_mup(this)">nothin</li>
+    </ul>
+  </div>
+  ${error_field("SUBREDDIT_NOEXIST", "sr", "div")}
+  ${error_field("SUBREDDIT_NOTALLOWED", "sr", "div")}
+  ${error_field("SUBREDDIT_REQUIRED", "sr", "div")}
 </%def>
